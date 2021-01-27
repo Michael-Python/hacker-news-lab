@@ -1,9 +1,13 @@
 import React from 'react';
 
-const NewsItem = ({}) => {
+const NewsItem = (props) => {
     return(
-        <h5>Hi, I'm a news item.</h5>
+        <div className="article">
+       <a href={props.url}><h3>{props.title}</h3></a> 
+       <p>{props.by}</p>
+        <p>{props.score}</p>
+
+        </div>
     )
 }
-
 export default NewsItem;

@@ -1,43 +1,41 @@
 import React, {useState, useEffect} from 'react';
 import NewsList from '../components/NewsList.js'
 import NewsItem from '../components/NewsItem.js'
+import NewsSorter from '../components/NewsSorter'
 
 const NewsContainer = () => {
 
-    const [articleListNumbers, setArticleListNumbers] = useState({});
     const [articleNumbersLoaded, setArticleNumbersLoaded] = useState(false);
-    const [specificArticle, setSpecificArticle] = useState({});
-    const [specificArticleLoaded, setSpecificArticleLoaded] = useState(false);
+    const [articleList, setArticleList] = useState([]);
 
     const getArticleListNumbers = () => {
         console.log("getting article number");
         fetch("https://hacker-news.firebaseio.com/v0/topstories.json")
         .then(res => res.json())
-        .then(data => setArticleListNumbers(data))
-        .then(() => setArticleNumbersLoaded(true))
+        .then(data => {
+            const articleNumbers = data.slice(0, 20)
+            const articleRequests = articleNumbers.map((number) => {
+                return fetch(`https://hacker-news.firebaseio.com/v0/item/${number}.json`)
+                .then(res => res.json())
+            }) 
+            Promise.all(articleRequests)
+            .then(data => setArticleList(data))
+            .then(() => setArticleNumbersLoaded(true))
+        })   
     }
 
     useEffect(() => {
         getArticleListNumbers();
     }, [])
 
-    const getSpecificArticle = () => {
-        console.log("getting specific article");
-        let articleId = 1
-        fetch(`https://hacker-news.firebaseio.com/v0/item/${articleId}.json`)
-        .then(res => res.json())
-        .then(data => setSpecificArticle(data))
-        .then(() => setSpecificArticleLoaded(true))
-    }
-    
-    useEffect(() => {
-        getSpecificArticle();
-    }, [])
+    const sortedArticles = articleList.sort((a, b) => (a.score < b.score) ? 1 : -1)
+
 
     return(
         <>
-        <h2>Hiya I'm the news container</h2>
-        <NewsList />
+        <h1>Hacker News</h1>
+        <NewsSorter sortedArticles={sortedArticles}></NewsSorter>
+        <NewsList articleList={articleList}/>
         </>
     )
 

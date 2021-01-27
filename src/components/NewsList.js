@@ -1,11 +1,24 @@
 import React from 'react';
 import NewsItem from './NewsItem';
 
-const NewsList = () => {
+const NewsList = ({articleList}) => {
+
+
     return(
         <>
-        <h3>hey I'm the new list</h3>
-        <NewsItem />
+
+        {articleList.map((article, index) => {
+            return(
+                <NewsItem
+                key={index}
+                title={article.title}
+                by={article.by}
+                score={article.score}
+                url={article.url}
+
+                />
+            )
+        })}
         </>
     )
 }
